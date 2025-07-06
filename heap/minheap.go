@@ -37,12 +37,54 @@ func (h *Minheap) insert(item int) {
 
 // Heapify up restores the heap property after insert
 func (h *Minheap) heapifyup(index int) {
-	// Continue until we reach the root (index 0) or the parent is smaller
 	for index > 0 && h.array[parent(index)] > h.array[index] {
-		// Swap with the parent
 		h.swap(parent(index), index)
-		// Move index up to parent
 		index = parent(index)
+	}
+}
+
+// Pop removes and returns the minimum element (root)
+func (h *Minheap) pop() int {
+	if len(h.array) == 0 {
+		fmt.Println("Heap is empty")
+		return -1 // or panic / return error
+	}
+
+	min := h.array[0]
+	lastIndex := len(h.array) - 1
+
+	// Replace root with last element
+	h.array[0] = h.array[lastIndex]
+	h.array = h.array[:lastIndex] // remove last element
+
+	// Heapify down from the root
+	h.heapifydown(0)
+
+	return min
+}
+
+// Heapify down restores the heap after pop
+func (h *Minheap) heapifydown(index int) {
+	lastIndex := len(h.array) - 1
+	smallest := index
+
+	for {
+		left := leftnode(index)
+		right := rightnode(index)
+
+		if left <= lastIndex && h.array[left] < h.array[smallest] {
+			smallest = left
+		}
+		if right <= lastIndex && h.array[right] < h.array[smallest] {
+			smallest = right
+		}
+
+		if smallest != index {
+			h.swap(index, smallest)
+			index = smallest
+		} else {
+			break
+		}
 	}
 }
 
@@ -54,5 +96,10 @@ func main() {
 	heap.insert(3)
 	heap.insert(2)
 	heap.insert(15)
+
 	fmt.Println("Final Min-Heap:", heap.array)
+
+	// Popping elements
+	fmt.Println("Popped:", heap.pop())
+	fmt.Println("Heap after pop:", heap.array)
 }
